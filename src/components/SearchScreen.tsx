@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Studio, Facility } from '../types';
 import { FACILITIES } from '../data/mockData';
+import { ScoredStudio, SORT_OPTIONS } from '../lib/matching';
 import { ChevronLeft, Search, Star, SlidersHorizontal, CheckSquare, Square, X } from 'lucide-react';
 
 interface SearchScreenProps {
-  studios: Studio[];
+  studios: ScoredStudio[];
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   selectedFilters: string[];
@@ -34,7 +35,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
 }) => {
   const [localInput, setLocalInput] = useState(searchQuery);
 
-  const sortOptions = ['매칭순', '실결제가 낮은순', '후기 많은순', '평점 높은순'];
+  const sortOptions = SORT_OPTIONS;
 
   const allFilters: Facility[] = [{ id: 'raw', nm: '원본 파일 포함' }, ...FACILITIES];
 
@@ -152,15 +153,13 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
           </div>
         ) : (
           studios.map((studio) => {
-            const allInPrice = studio.pd.base + (!studio.pd.raw ? studio.pd.rawFee : 0);
+            const allInPrice = studio.allInPrice;
             const discountPercent = Math.round((1 - studio.pd.base / studio.pd.list) * 100);
-            const gap = allInPrice - studio.pd.base;
+            const gap = studio.rawGap;
             const isSelectedForQuote = selectedForQuote.includes(studio.id);
 
-            // Match score formula
-            const matchScore = studio.ad
-              ? '광고'
-              : `매칭 ${Math.min(99, Math.round(75 + (studio.rt / 10) * 15 + (studio.resp > 90 ? 8 : 0)))}%`;
+            // 목록 정렬과 동일한 점수를 그대로 보여준다 (lib/matching.ts)
+            const matchScore = studio.ad ? '광고' : `매칭 ${studio.matchScore}%`;
 
             return (
               <div

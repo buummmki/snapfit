@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Studio } from '../types';
 import { CONCEPTS, FACILITIES } from '../data/mockData';
-import { ChevronLeft, Share2, Bookmark, Heart, Star, Sparkles, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Share2, Bookmark, Heart, Star, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 interface DetailScreenProps {
   studio: Studio;
@@ -18,9 +18,6 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({
   isSaved,
   onToggleSave,
 }) => {
-  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-
   const p = studio.pd;
   const allInPrice = p.base + (!p.raw ? p.rawFee : 0);
   const maxPrice = p.base + studio.ex.reduce((sum, e) => sum + e.a, 0);
@@ -28,35 +25,6 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({
   const gap = allInPrice - p.base;
 
   const formatMan = (num: number) => `${Math.round(num / 10000).toLocaleString('ko-KR')}만원`;
-
-  const handleAiAnalyze = async () => {
-    setIsAnalyzing(true);
-    try {
-      const res = await fetch('/api/gemini/analyze-quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quoteDetails: {
-            studioName: studio.nm,
-            packageName: p.nm,
-            basePrice: p.base,
-            rawIncluded: p.raw,
-            rawFee: p.rawFee,
-            allInPrice,
-            maxPrice,
-            extraFees: studio.ex,
-            facilities: studio.fac,
-          },
-        }),
-      });
-      const data = await res.json();
-      setAiAnalysis(data.analysis || '견적 분석을 완료했습니다.');
-    } catch (err) {
-      setAiAnalysis('AI 분석 서버 통신 중 오류가 발생했습니다. 나중에 다시 시도해주세요.');
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
 
   return (
     <div className="flex flex-col h-full bg-white relative">
@@ -294,23 +262,6 @@ export const DetailScreen: React.FC<DetailScreenProps> = ({
             </div>
           </div>
 
-          {/* AI Quote Auditor Button */}
-          <div className="mt-4">
-            <button
-              onClick={handleAiAnalyze}
-              disabled={isAnalyzing}
-              className="w-full py-3 rounded-xl border border-[#FF5C1F] bg-[#FFF5F0] text-[#FF5C1F] font-extrabold text-[14px] flex items-center justify-center gap-2 hover:bg-[#FFEAE0] transition-colors"
-            >
-              <Sparkles className="w-4.5 h-4.5" />
-              <span>{isAnalyzing ? 'AI가 추가금 위험도를 정밀 진단 중...' : '🤖 AI 견적 & 추가금 위험도 정밀진단 받기'}</span>
-            </button>
-
-            {aiAnalysis && (
-              <div className="mt-3 p-4 bg-[#FAFBFC] rounded-xl border border-[#E5E8EB] text-[13.5px] text-[#191F28] whitespace-pre-line leading-relaxed font-medium">
-                {aiAnalysis}
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Divider */}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Studio, OccasionId, ConceptId } from '../types';
 import { OCCASIONS, CONCEPTS } from '../data/mockData';
-import { Search, MessageSquare, Bell, Bookmark, Heart, Star, ChevronDown, Sparkles } from 'lucide-react';
+import { Search, MessageSquare, Bell, Bookmark, Heart, Star, ChevronDown } from 'lucide-react';
 
 interface HomeScreenProps {
   selectedSido: string;
@@ -14,7 +14,6 @@ interface HomeScreenProps {
   savedStudioIds: number[];
   onToggleSave: (id: number, e: React.MouseEvent) => void;
   studios: Studio[];
-  onOpenAiHub: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -28,7 +27,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   savedStudioIds,
   onToggleSave,
   studios,
-  onOpenAiHub,
 }) => {
   const currentOcc = OCCASIONS.find((o) => o.id === selectedOccasions[0]);
   const primarySearchText = selectedSubs[0] || (currentOcc ? `${currentOcc.nm} 촬영` : '100일 촬영');
@@ -68,14 +66,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     { ic: '💸', bg: '#FFEDE6', label: '원본 포함만 보기', key: 'raw' },
     { ic: '🍼', bg: '#FFF3E0', label: '수유실 있는 곳', key: 'nursing' },
     { ic: '🚗', bg: '#EAF7EE', label: '주차 되는 곳', key: 'parking' },
-    { ic: '✨', bg: '#FDE9F3', label: 'AI 컨셉 찾기', key: 'ai' },
     { ic: '📅', bg: '#E9F5FF', label: '내 견적요청', key: 'my' },
   ];
 
   const handleQuickClick = (key: string) => {
-    if (key === 'ai') {
-      onOpenAiHub();
-    } else if (key === 'raw') {
+    if (key === 'raw') {
       onGoSearch('', 'raw');
     } else if (key === 'nursing') {
       onGoSearch('', 'nursing');
@@ -109,13 +104,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
         {/* Right Icons */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={onOpenAiHub}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#191F28] hover:bg-[#F2F4F6] transition-colors"
-            title="AI 핏매니저 상담"
-          >
-            <Sparkles className="w-5 h-5 text-[#FF5C1F]" />
-          </button>
           <button
             onClick={() => onGoSearch()}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#191F28] hover:bg-[#F2F4F6] transition-colors"

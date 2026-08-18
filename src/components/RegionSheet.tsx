@@ -53,15 +53,15 @@ export const RegionSheet: React.FC<RegionSheetProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="absolute inset-0 z-50 flex items-end justify-center">
       {/* Dimmed backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+        className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
       {/* Sheet Container */}
-      <div className="relative w-full max-w-[440px] bg-white rounded-t-[24px] shadow-2xl z-10 flex flex-col max-h-[82vh] h-[640px] animate-in slide-in-from-bottom duration-250">
+      <div className="relative w-full bg-white rounded-t-[24px] shadow-2xl z-10 flex flex-col max-h-[86%] h-[640px] animate-in slide-in-from-bottom duration-250">
         {/* Grab bar */}
         <div className="w-11 h-1 bg-[#E5E8EB] rounded-full mx-auto mt-2.5 shrink-0" />
 

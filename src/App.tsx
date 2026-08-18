@@ -1,11 +1,7 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import { Studio, OccasionId, ConceptId, ModeType } from './types';
 import { STUDIOS } from './data/mockData';
+import { scoreStudios, sortStudios, ScoredStudio } from './lib/matching';
 import { PhoneFrame } from './components/PhoneFrame';
 import { Onboarding } from './components/Onboarding';
 import { HomeScreen } from './components/HomeScreen';
@@ -15,15 +11,14 @@ import { InquiryScreen } from './components/InquiryScreen';
 import { CommunityScreen } from './components/CommunityScreen';
 import { DiscoverScreen } from './components/DiscoverScreen';
 import { SavedScreen } from './components/SavedScreen';
-import { AiHubScreen } from './components/AiHubScreen';
 import { RegionSheet } from './components/RegionSheet';
-import { Home, Bookmark, Compass, Users, Sparkles } from 'lucide-react';
+import { Home, Bookmark, Compass, Users } from 'lucide-react';
 
 export default function App() {
   // Navigation State
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
-  const [activeTab, setActiveTab] = useState<number>(0); // 0: Home, 1: Saved, 2: Discover, 3: Community, 4: AI
+  const [activeTab, setActiveTab] = useState<number>(0); // 0: Home, 1: Saved, 2: Discover, 3: Community
   const [currentView, setCurrentView] = useState<
     'main' | 'search' | 'detail' | 'inquiry'
   >('main');
@@ -49,8 +44,8 @@ export default function App() {
   const [isRegionSheetOpen, setIsRegionSheetOpen] = useState(false);
 
   // Filtered Studios Computation
-  const getFilteredStudios = () => {
-    let list = STUDIOS.filter((s) => {
+  const getFilteredStudios = (): ScoredStudio[] => {
+    const base = STUDIOS.filter((s) => {
       // Occasion filter (if not empty)
       if (selectedOccasions.length > 0) {
         const matchesOcc = selectedOccasions.some((occ) => s.cat.includes(occ));
@@ -85,33 +80,17 @@ export default function App() {
       return true;
     });
 
-    // Sorting
-    if (sortIndex === 0) {
-      // Match score desc, keeping ads first
-      list.sort((a, b) => {
-        const aScore = a.ad ? 999 : a.rt * 10 + a.resp * 0.1;
-        const bScore = b.ad ? 999 : b.rt * 10 + b.resp * 0.1;
-        return bScore - aScore;
-      });
-    } else if (sortIndex === 1) {
-      // All-in price asc
-      list.sort((a, b) => {
-        const aAll = a.pd.base + (!a.pd.raw ? a.pd.rawFee : 0);
-        const bAll = b.pd.base + (!b.pd.raw ? b.pd.rawFee : 0);
-        return aAll - bAll;
-      });
-    } else if (sortIndex === 2) {
-      // Review count desc
-      list.sort((a, b) => b.rv - a.rv);
-    } else if (sortIndex === 3) {
-      // Rating desc
-      list.sort((a, b) => b.rt - a.rt);
-    }
-
-    return list;
+    // 매칭 점수 부착 후 정렬. 점수 계산과 정렬 모두 lib/matching.ts를 쓴다.
+    return sortStudios(scoreStudios(base, { concepts: selectedConcepts }), sortIndex);
   };
 
   const filteredStudios = getFilteredStudios();
+
+  // 홈 추천은 필터와 무관하게 사용자의 관심 컨셉 기준으로 정렬한다.
+  const recommendedStudios = sortStudios(
+    scoreStudios(STUDIOS, { concepts: selectedConcepts }),
+    0,
+  );
 
   const handleToggleSave = (id: number, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -164,7 +143,6 @@ export default function App() {
     { id: 1, label: '저장', icon: Bookmark, badge: savedStudioIds.length > 0 },
     { id: 2, label: '발견', icon: Compass },
     { id: 3, label: '커뮤니티', icon: Users, badge: true },
-    { id: 4, label: 'AI 스튜디오', icon: Sparkles },
   ];
 
   return (
@@ -255,8 +233,7 @@ export default function App() {
                     onSelectStudio={handleSelectStudio}
                     savedStudioIds={savedStudioIds}
                     onToggleSave={handleToggleSave}
-                    studios={STUDIOS}
-                    onOpenAiHub={() => setActiveTab(4)}
+                    studios={recommendedStudios}
                   />
                 )}
 
@@ -277,8 +254,6 @@ export default function App() {
                 )}
 
                 {activeTab === 3 && <CommunityScreen />}
-
-                {activeTab === 4 && <AiHubScreen />}
               </>
             )}
           </div>
@@ -303,9 +278,7 @@ export default function App() {
                   >
                     <div className="relative">
                       <Icon
-                        className={`w-5.5 h-5.5 ${
-                          isActive && tab.id !== 4 ? 'stroke-[2.4]' : 'stroke-[1.8]'
-                        } ${isActive && tab.id === 4 ? 'text-[#FF5C1F]' : ''}`}
+                        className={`w-5.5 h-5.5 ${isActive ? 'stroke-[2.4]' : 'stroke-[1.8]'}`}
                       />
                       {tab.badge && (
                         <span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 rounded-full bg-[#FF5C1F]" />

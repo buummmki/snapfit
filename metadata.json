@@ -2,5 +2,5 @@
   "name": "스냅핏 SnapFit",
   "description": "목적 기반 사진 스튜디오 소싱 & 표준 견적 비교 플랫폼",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
