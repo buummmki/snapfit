@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Studio, OccasionId, ConceptId, ModeType } from './types';
 import { STUDIOS } from './data/mockData';
 import { scoreStudios, sortStudios, ScoredStudio } from './lib/matching';
-import { PhoneFrame } from './components/PhoneFrame';
+import { AppShell } from './components/AppShell';
 import { Onboarding } from './components/Onboarding';
 import { HomeScreen } from './components/HomeScreen';
 import { SearchScreen } from './components/SearchScreen';
@@ -146,7 +146,7 @@ export default function App() {
   ];
 
   return (
-    <PhoneFrame>
+    <AppShell>
       {/* Onboarding View */}
       {!isOnboarded ? (
         <Onboarding
@@ -308,6 +308,6 @@ export default function App() {
         currentSido={selectedSido}
         onSelectSido={setSelectedSido}
       />
-    </PhoneFrame>
+    </AppShell>
   );
 }

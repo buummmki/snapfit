@@ -1,19 +1,37 @@
 @import "tailwindcss";
 
 @layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
+  /* 스크롤바 숨김 (Chrome/Safari/Opera + IE/Edge/Firefox) */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-  /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo',
+    'Malgun Gothic', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f4f5f7;
+  color: #191f28;
+  /* 모바일에서 위아래로 당길 때 페이지 전체가 늘어나는 것을 막는다 */
+  overscroll-behavior-y: none;
+}
+
+/* 가로 방향 safe-area (아이폰 가로모드·엣지 디스플레이) */
+@media (max-width: 767px) {
+  #root {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
